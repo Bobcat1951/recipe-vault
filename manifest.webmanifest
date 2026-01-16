@@ -1,0 +1,8 @@
+{
+  "name": "Recipe Vault",
+  "short_name": "Recipes",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e293b"
+}
