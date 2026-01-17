@@ -1,12 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Recipe Vault</title>
+<style>https://github.com/Bobcat1951/recipe-vault/edit/main/index.html
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:0;background:#f5f5f5}
+header{padding:16px;background:#1e293b;color:white;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px}
+button{padding:18px;font-size:16px;border:none;border-radius:12px;background:#e2e8f0}
+.list{padding:16px}
+.item{padding:10px;background:white;margin-bottom:8px;border-radius:8px}
+textarea{width:100%;height:180px}
+input,select{width:100%;padding:8px;margin-bottom:8px}
+.top{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.small{font-size:14px;padding:10px}
+.voice{background:#c7d2fe}
+.import{background:#bbf7d0}
+</style>
 </head>
 <body>
-<h1>Recipe Vault</h1>
-<p>Your recipe app is running.</p>
+
+<header>Recipe Vault</header>
+<div id="app"></div>
+
+<script>
+const categories=["Beef","Chicken","Pork","Lamb","Pasta","Seafood","Desserts","Sauces"];
+let state=JSON.parse(localStorage.getItem("recipes")||"{}");
+let notes=JSON.parse(localStorage.getItem("notes")||"{}");
+function save(){
+ localStorage.setItem("recipes",JSON.stringify(state));
+ localStorage.setItem("notes",JSON.stringify(notes));
+}
+
+function home(){
+ document.getElementById("app").innerHTML=`
+ <div class="list">
+ <button onclick="allSearch()">🔍 All Recipes Search</button>
+ </div>
+ <div class="grid">
+ ${categories.map(c=>`<button onclick="openCat('${c}')">${c}</button>`).join("")}
+ </div>`;
+}
+
+function openCat(cat){
+ state[cat]=state[cat]||[];
+ notes[cat]=notes[cat]||"";
+ document.getElementById("app").innerHTML=`
+ <div class="list">
+ <div class="top">
+ <button class="small" onclick="home()">← Back</button>
+ <button class="small" onclick="addRecipe('${cat}')">＋ Add</button>
+ </div>
+ <textarea placeholder="Category notes..." 
+ oninput="notes['${cat}']=this.value;save()">${notes[cat]}</textarea>
+ <input placeholder="Search ${cat}..." oninput="filter(this.value,'${cat}')"/>
+ <div id="items">
+ ${state[cat].map((r,i)=>itemHTML(cat,i,r)).join("")}
+ </div>
+ </div>`;
+}
+
+function itemHTML(cat,i,r){
+ return `<div class="item" onclick="editRecipe('${cat}',${i})">${r.name}</div>`;
+}
+
+function filter(val,cat){
+ const items=state[cat].filter(r=>r.name.toLowerCase().includes(val.toLowerCase()));
+ document.getElementById("items").innerHTML=items.map((r,i)=>itemHTML(cat,i,r)).join("");
+}
+
+function addRecipe(cat){
+ state[cat].push({name:"New Recipe",text:""});
+ save(); openCat(cat);
+}
+
+function editRecipe(cat,i){
+ const r=state[cat][i];
+ document.getElementById("app").innerHTML=`
+ <div class="list">
+ <button onclick="openCat('${cat}')">← Back</button>
+ <input value="${r.name}" 
+ oninput="state['${cat}'][${i}].name=this.value;save()"/>
+ <textarea 
+ oninput="state['${cat}'][${i}].text=this.value;save()">
+ ${r.text}
+ </textarea>
+ </div>`;
+}
+
+function allSearch(){
+ document.getElementById("app").innerHTML=`
+ <div class="list">
+ <button onclick="home()">← Back</button>
+ <input placeholder="Search everything..." oninput="allFilter(this.value)"/>
+ <div id="items"></div>
+ </div>`;
+}
+
+function allFilter(val){
+ let out=[];
+ categories.forEach(c=>{
+ (state[c]||[]).forEach((r,i)=>{
+ if(r.name.toLowerCase().includes(val.toLowerCase()))
+ out.push(`<div class="item">${r.name} (${c})</div>`);
+ });
+ });
+ document.getElementById("items").innerHTML=out.join("");
+}
+
+home();
+</script>
+
 </body>
 </html>
