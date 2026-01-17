@@ -20,27 +20,11 @@ input,select{width:100%;padding:8px;margin-bottom:8px}
 </style>
 </head>
 <body>
+<header>
+  <button class="back" onclick="history.back()">⬅</button>
+  <h1>Recipe Vault</h1>
+</header>
 
-header {
-  position: relative;
-  padding: 16px;
-  background: #1e293b;
-  color: white;
-  text-align: center;
-}
-
-.back {
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 18px;
-  cursor: pointer;
-  padding: 8px;
-  z-index: 10;
-}
 <div id="app"></div>
 
 <script>
